@@ -1,0 +1,13 @@
+{
+  "name": "node-dbus-notifier",
+  "version": "0.0.1",
+  "description": "DBus-based desktop notifications with full feature support",
+  "main": "notifier.js",
+  "types": "notifier.d.js",
+  "repository": "https://github.com/Hill-98/node-dbus-notifier",
+  "author": "Zhong Lufan",
+  "license": "MIT",
+  "dependencies": {
+    "dbus-next": "^0.10.2"
+  }
+}
