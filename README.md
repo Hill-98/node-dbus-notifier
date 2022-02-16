@@ -10,11 +10,11 @@ const notifier = require('node-dbus-notifier');
 
 const notify = new notifier.Notify({
   appName: 'nodejs',
-  appIcon: 'dialog-information"',
+  appIcon: 'text-html',
   summary: 'Hello',
   body: 'This is a body text',
   hints: {
-    soundName: 'message-new-instant',
+    urgency: 2,
   },
   timeout: 5000,
 });
