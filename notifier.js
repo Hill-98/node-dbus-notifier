@@ -191,4 +191,7 @@ class Notify {
 
 module.exports = {
   Notify,
+  disconnectSessionBus,
+  getInterface,
+  getSessionBus,
 }
