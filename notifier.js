@@ -101,11 +101,15 @@ const setInterface = function setInterface(interface) {
   }
 }
 
-let IX = 0;
-const genIdentifier = function genIdentifier() {
-  IX = IX >= 25 ? 0 : IX + 1;
-  return String.fromCharCode(IX);
+const genIdentifier = function* genIdentifier() {
+  let IX = 0;
+  while(true) {
+    IX = IX >= 25 ? 0 : IX + 1;
+    const ide = String.fromCharCode(64 + IX);
+    yield ide;
+  };
 }
+const identifier = genIdentifier();
 
 const S = {
   actionCallbacks: Symbol('actionsCallback'),
@@ -188,7 +192,7 @@ class Notify {
   }
 
   addAction(actionText, callback) {
-    const actionKey = genIdentifier();
+    const actionKey = identifier.next().value;
     this.config.actions.push(actionKey, actionText);
     this[S.actionCallbacks].set(actionKey, callback);
   }
