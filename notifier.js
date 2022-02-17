@@ -32,11 +32,6 @@ const setSessionBus = function setSessionBus(sessionBus) {
   Notifications = undefined;
 }
 
-const unsetNotifications = function unsetNotifications() {
-  Notifications?.removeAllListeners();
-  Notifications = undefined;
-}
-
 const disconnectSessionBus = function disconnectSessionBus() {
   if (!selfSessionBus) {
     return;
@@ -53,6 +48,32 @@ const disconnectSessionBus = function disconnectSessionBus() {
   }, 100);
 }
 
+const actionInvoked = function actionInvoked(id, actionKey) {
+  notifierEmitter.emit(`ActionInvoked:${id}`, actionKey);
+}
+
+const notificationClosed = function notificationClosed(id, reason) {
+  notifierEmitter.emit(`NotificationClosed:${id}`, reason);
+  if (Config.autoDisconnectSessionBus) {
+    disconnectSessionBus();
+  }
+}
+
+const bindNotifications = function bindNotifications(interface) {
+  // Since the NotificationClosed event will fire when any notification is closed
+  // using ID to trigger the event here allows us to use once() elsewhere without binding too many events
+  Notifications = interface;
+  Notifications.on('ActionInvoked', actionInvoked);
+  Notifications.on('NotificationClosed', notificationClosed);
+  return Notifications;
+}
+
+const unsetNotifications = function unsetNotifications() {
+  Notifications?.off('ActionInvoked', actionInvoked);
+  Notifications?.off('NotificationClosed', notificationClosed);
+  Notifications = undefined;
+}
+
 const getInterface = function getInterface() {
   if (Notifications) {
     return Promise.resolve(Notifications);
@@ -60,27 +81,24 @@ const getInterface = function getInterface() {
   return new Promise((reslove, reject) => {
     getSessionBus().getProxyObject('org.freedesktop.Notifications', '/org/freedesktop/Notifications')
       .then((obj) => {
-        Notifications = obj.getInterface('org.freedesktop.Notifications');
-        // Since the NotificationClosed event will fire when any notification is closed
-        // using ID to trigger the event here allows us to use once() elsewhere without binding too many events
-        Notifications.on('ActionInvoked', (id, action_key) => {
-          notifierEmitter.emit(`ActionInvoked:${id}`, action_key);
-        })
-        Notifications.on('NotificationClosed', (id, reason) => {
-          notifierEmitter.emit(`NotificationClosed:${id}`, reason);
-          if (Config.autoDisconnectSessionBus) {
-          disconnectSessionBus();
-          }
-        })
-        reslove(Notifications);
+        reslove(bindNotifications(obj.getInterface('org.freedesktop.Notifications')));
       })
       .catch((err) => {
         if (Config.autoDisconnectSessionBus) {
-        disconnectSessionBus();
+          disconnectSessionBus();
         }
         reject(err);
       });
   });
+}
+
+const setInterface = function setInterface(interface) {
+  if (interface) {
+    disconnectSessionBus();
+    bindNotifications(interface);
+  } else {
+    unsetNotifications();
+  }
 }
 
 let IX = 0;
@@ -224,6 +242,7 @@ module.exports = {
   Config,
   disconnectSessionBus,
   getInterface,
+  setInterface,
   getSessionBus,
   setSessionBus,
 };
