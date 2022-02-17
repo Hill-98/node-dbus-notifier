@@ -47,3 +47,17 @@ export class Notify {
 
   show(): Promise<NotificationClosedResult>;
 }
+
+export const Config = {
+  autoDisconnectSessionBus: boolean,
+}
+
+export function disconnectSessionBus(): void;
+
+export function getInterface(): any;
+
+export function setInterface(interface?: any): void;
+
+export function getSessionBus(): any;
+
+export function setSessionBus(sessionBus?: any): void;
