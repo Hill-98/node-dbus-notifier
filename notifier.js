@@ -32,6 +32,11 @@ const setSessionBus = function setSessionBus(sessionBus) {
   Notifications = undefined;
 }
 
+const unsetNotifications = function unsetNotifications() {
+  Notifications?.removeAllListeners();
+  Notifications = undefined;
+}
+
 const disconnectSessionBus = function disconnectSessionBus() {
   if (!selfSessionBus) {
     return;
@@ -42,8 +47,8 @@ const disconnectSessionBus = function disconnectSessionBus() {
     if (NUMBER > 0) {
       return;
     }
+    unsetNotifications();
     selfSessionBus?.disconnect();
-    Notifications = undefined;
     selfSessionBus = undefined;
   }, 100);
 }
