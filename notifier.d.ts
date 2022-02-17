@@ -35,15 +35,15 @@ export enum Status {
 }
 
 export class Notify {
+  readonly id: number;
+
+  readonly status: Status;
+
   constructor(config: Partial<NotifyConfig>);
 
   addAction(actionText: string, callback: () => void): void;
 
   close(): Promise<void>;
 
-  id(): number;
-
   show(): Promise<NotificationClosedResult>;
-
-  status(): Status;
 }

@@ -62,7 +62,7 @@ const S = {
   actionInvoked: Symbol('ActionInvoked'),
   config: Symbol('config'),
   id: Symbol('id'),
-  status: Symbol('isClosed'),
+  status: Symbol('status'),
 }
 
 class Notify {
@@ -77,6 +77,14 @@ class Notify {
     if (callback) {
       callback();
     }
+  }
+
+  get id() {
+    return this[S.id];
+  }
+
+  get status() {
+    return this[S.status];
   }
 
   constructor(config) {
@@ -141,10 +149,6 @@ class Notify {
     }
   }
 
-  id() {
-    return this[S.id];
-  }
-
   show() {
     const params = [
       this.config.appName,
@@ -180,10 +184,6 @@ class Notify {
         })
         .catch(reject);
     });
-  }
-
-  status() {
-    return this[S.status];
   }
 }
 
