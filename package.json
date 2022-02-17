@@ -7,6 +7,9 @@
   "repository": "https://github.com/Hill-98/node-dbus-notifier",
   "author": "Zhong Lufan",
   "license": "MIT",
+  "engines": {
+    "node": ">= 15.0.0"
+  },
   "dependencies": {
     "dbus-next": "^0.10.2"
   }
