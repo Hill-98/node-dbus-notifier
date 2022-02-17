@@ -7,6 +7,10 @@ let SessionBus;
 let Notifications;
 let NUMBER = 0;
 
+const Config = {
+  autoDisconnectSessionBus: true,
+};
+
 const notifierEmitter = new EventEmitter();
 
 const getSessionBus = function getSessionBus() {
@@ -42,12 +46,16 @@ const getInterface = function getInterface() {
         })
         Notifications.on('NotificationClosed', (id, reason) => {
           notifierEmitter.emit(`NotificationClosed:${id}`, reason);
+          if (Config.autoDisconnectSessionBus) {
           disconnectSessionBus();
+          }
         })
         reslove(Notifications);
       })
       .catch((err) => {
+        if (Config.autoDisconnectSessionBus) {
         disconnectSessionBus();
+        }
         reject(err);
       });
   });
@@ -191,6 +199,7 @@ class Notify {
 
 module.exports = {
   Notify,
+  Config,
   disconnectSessionBus,
   getInterface,
   getSessionBus,
