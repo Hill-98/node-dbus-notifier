@@ -9,6 +9,11 @@ let NUMBER = 0;
 
 const notifierEmitter = new EventEmitter();
 
+const getSessionBus = function getSessionBus() {
+  SessionBus ??= dbusNext.sessionBus();
+  return SessionBus;
+}
+
 const disconnectSessionBus = function disconnectSessionBus() {
   // dbus-next bug
   // disconnecting the dbus connection immediately will throw an error, so let's delay the disconnection just in case.
@@ -26,11 +31,8 @@ const getInterface = function getInterface() {
   if (Notifications) {
     return Promise.resolve(Notifications);
   }
-  if (!SessionBus) {
-    SessionBus = dbusNext.sessionBus();
-  }
   return new Promise((reslove, reject) => {
-    SessionBus.getProxyObject('org.freedesktop.Notifications', '/org/freedesktop/Notifications')
+    getSessionBus().getProxyObject('org.freedesktop.Notifications', '/org/freedesktop/Notifications')
       .then((obj) => {
         Notifications = obj.getInterface('org.freedesktop.Notifications');
         // Since the NotificationClosed event will fire when any notification is closed
