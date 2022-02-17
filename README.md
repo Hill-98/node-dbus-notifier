@@ -24,7 +24,7 @@ notify.addAction('Click Me', () => {
 });
 
 notify.show()
-  .then(() => {
-    console.log('notify is closed');
+  .then((result) => {
+    console.log(`notify is closed: ${JSON.stringify(result)}`);
   });
 ```
