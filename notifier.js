@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 const dbusNext = require('dbus-next');
 
-const variant = dbusNext.Variant;
+const { Variant } = dbusNext;
 
 let SESSION;
 let Notifications;
@@ -100,40 +100,40 @@ class Notify {
     }
     const hints = config.hints ?? {};
     if (typeof hints.actionIcons === 'boolean') {
-      this.config.hints['action-icons'] = new variant('b', hints.actionIcons);
+      this.config.hints['action-icons'] = new Variant('b', hints.actionIcons);
     }
     if (typeof hints.category === 'string') {
-      this.config.hints['category'] = new variant('s', hints.category);
+      this.config.hints['category'] = new Variant('s', hints.category);
     }
     if (typeof hints.desktopEntry === 'string') {
-      this.config.hints['desktop-entry'] = new variant('s', hints.desktopEntry);
+      this.config.hints['desktop-entry'] = new Variant('s', hints.desktopEntry);
     }
     if (typeof hints.imagePath === 'string') {
-      this.config.hints['image-path'] = new variant('s', hints.imagePath);
+      this.config.hints['image-path'] = new Variant('s', hints.imagePath);
     }
     if (typeof hints.resident === 'boolean') {
-      this.config.hints['resident'] = new variant('b', hints.resident);
+      this.config.hints['resident'] = new Variant('b', hints.resident);
     }
     if (typeof hints.soundFile === 'string') {
-      this.config.hints['sound-file'] = new variant('s', hints.soundFile);
+      this.config.hints['sound-file'] = new Variant('s', hints.soundFile);
     }
     if (typeof hints.soundName === 'string') {
-      this.config.hints['sound-name'] = new variant('s', hints.soundName);
+      this.config.hints['sound-name'] = new Variant('s', hints.soundName);
     }
     if (typeof hints.suppressSound === 'boolean') {
-      this.config.hints['suppress-sound'] = new variant('b', hints.suppressSound);
+      this.config.hints['suppress-sound'] = new Variant('b', hints.suppressSound);
     }
     if (typeof hints.transient === 'boolean') {
-      this.config.hints['transient'] = new variant('b', hints.transient);
+      this.config.hints['transient'] = new Variant('b', hints.transient);
     }
     if (typeof hints.x === 'number') {
-      this.config.hints['x'] = new variant('i', hints.x);
+      this.config.hints['x'] = new Variant('i', hints.x);
     }
     if (typeof hints.y === 'number') {
-      this.config.hints['y'] = new variant('i', hints.y);
+      this.config.hints['y'] = new Variant('i', hints.y);
     }
     if (typeof hints.urgency === 'number') {
-      this.config.hints['urgency'] = new variant('y', hints.urgency);
+      this.config.hints['urgency'] = new Variant('y', hints.urgency);
     }
   }
 
