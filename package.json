@@ -2,9 +2,14 @@
   "name": "node-dbus-notifier",
   "version": "0.0.1",
   "description": "DBus-based desktop notifications with full feature support",
+  "keywords": ["dbus", "notifier", "destop", "notification"],
   "main": "notifier.js",
   "types": "notifier.d.js",
-  "repository": "https://github.com/Hill-98/node-dbus-notifier",
+  "homepage": "https://github.com/Hill-98/node-dbus-notifier",
+  "repository": "github:Hill-98/node-dbus-notifier",
+  "bugs": {
+    "url": "https://github.com/Hill-98/node-dbus-notifier/issues"
+  },
   "author": "Zhong Lufan",
   "license": "MIT",
   "engines": {
