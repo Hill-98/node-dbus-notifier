@@ -3,22 +3,22 @@ const dbusNext = require('dbus-next');
 
 const { Variant } = dbusNext;
 
-let SESSION;
+let SessionBus;
 let Notifications;
 let NUMBER = 0;
 
 const notifierEmitter = new EventEmitter();
 
-const disconnectSession = function disconnectSession() {
+const disconnectSessionBus = function disconnectSessionBus() {
   // dbus-next bug
   // disconnecting the dbus connection immediately will throw an error, so let's delay the disconnection just in case.
   setTimeout(() => {
     if (NUMBER > 0) {
       return;
     }
-    SESSION?.disconnect();
+    SessionBus?.disconnect();
     Notifications = undefined;
-    SESSION = undefined;
+    SessionBus = undefined;
   }, 100);
 }
 
@@ -26,11 +26,11 @@ const getInterface = function getInterface() {
   if (Notifications) {
     return Promise.resolve(Notifications);
   }
-  if (!SESSION) {
-    SESSION = dbusNext.sessionBus();
+  if (!SessionBus) {
+    SessionBus = dbusNext.sessionBus();
   }
   return new Promise((reslove, reject) => {
-    SESSION.getProxyObject('org.freedesktop.Notifications', '/org/freedesktop/Notifications')
+    SessionBus.getProxyObject('org.freedesktop.Notifications', '/org/freedesktop/Notifications')
       .then((obj) => {
         Notifications = obj.getInterface('org.freedesktop.Notifications');
         // Since the NotificationClosed event will fire when any notification is closed
@@ -40,12 +40,12 @@ const getInterface = function getInterface() {
         })
         Notifications.on('NotificationClosed', (id, reason) => {
           notifierEmitter.emit(`NotificationClosed:${id}`, reason);
-          disconnectSession();
+          disconnectSessionBus();
         })
         reslove(Notifications);
       })
       .catch((err) => {
-        disconnectSession();
+        disconnectSessionBus();
         reject(err);
       });
   });
