@@ -3,7 +3,8 @@ const dbusNext = require('dbus-next');
 
 const { Variant } = dbusNext;
 
-let SessionBus;
+let externalSessionBus;
+let selfSessionBus;
 let Notifications;
 let NUMBER = 0;
 
@@ -14,20 +15,36 @@ const Config = {
 const notifierEmitter = new EventEmitter();
 
 const getSessionBus = function getSessionBus() {
-  SessionBus ??= dbusNext.sessionBus();
-  return SessionBus;
+  if (externalSessionBus) {
+    return externalSessionBus;
+  }
+  selfSessionBus ??= dbusNext.sessionBus();
+  return selfSessionBus;
+}
+
+const setSessionBus = function setSessionBus(sessionBus) {
+  if (selfSessionBus) {
+    selfSessionBus.disconnect();
+    selfSessionBus = undefined;
+  }
+  externalSessionBus = sessionBus;
+  Config.autoDisconnectSessionBus = Config.autoDisconnectSessionBus && !sessionBus;
+  Notifications = undefined;
 }
 
 const disconnectSessionBus = function disconnectSessionBus() {
+  if (!selfSessionBus) {
+    return;
+  }
   // dbus-next bug
   // disconnecting the dbus connection immediately will throw an error, so let's delay the disconnection just in case.
   setTimeout(() => {
     if (NUMBER > 0) {
       return;
     }
-    SessionBus?.disconnect();
+    selfSessionBus?.disconnect();
     Notifications = undefined;
-    SessionBus = undefined;
+    selfSessionBus = undefined;
   }, 100);
 }
 
@@ -203,4 +220,5 @@ module.exports = {
   disconnectSessionBus,
   getInterface,
   getSessionBus,
-}
+  setSessionBus,
+};
