@@ -142,7 +142,7 @@ class Notify {
   }
 
   constructor(config) {
-    this.config = {
+    this[S.config] = {
       appName: config.appName ?? 'node',
       replacesId: config.replacesId ?? 0,
       appIcon: config.appIcon ?? '',
@@ -154,46 +154,46 @@ class Notify {
     }
     const hints = config.hints ?? {};
     if (typeof hints.actionIcons === 'boolean') {
-      this.config.hints['action-icons'] = new Variant('b', hints.actionIcons);
+      this[S.config].hints['action-icons'] = new Variant('b', hints.actionIcons);
     }
     if (typeof hints.category === 'string') {
-      this.config.hints['category'] = new Variant('s', hints.category);
+      this[S.config].hints['category'] = new Variant('s', hints.category);
     }
     if (typeof hints.desktopEntry === 'string') {
-      this.config.hints['desktop-entry'] = new Variant('s', hints.desktopEntry);
+      this[S.config].hints['desktop-entry'] = new Variant('s', hints.desktopEntry);
     }
     if (typeof hints.imagePath === 'string') {
-      this.config.hints['image-path'] = new Variant('s', hints.imagePath);
+      this[S.config].hints['image-path'] = new Variant('s', hints.imagePath);
     }
     if (typeof hints.resident === 'boolean') {
-      this.config.hints['resident'] = new Variant('b', hints.resident);
+      this[S.config].hints['resident'] = new Variant('b', hints.resident);
     }
     if (typeof hints.soundFile === 'string') {
-      this.config.hints['sound-file'] = new Variant('s', hints.soundFile);
+      this[S.config].hints['sound-file'] = new Variant('s', hints.soundFile);
     }
     if (typeof hints.soundName === 'string') {
-      this.config.hints['sound-name'] = new Variant('s', hints.soundName);
+      this[S.config].hints['sound-name'] = new Variant('s', hints.soundName);
     }
     if (typeof hints.suppressSound === 'boolean') {
-      this.config.hints['suppress-sound'] = new Variant('b', hints.suppressSound);
+      this[S.config].hints['suppress-sound'] = new Variant('b', hints.suppressSound);
     }
     if (typeof hints.transient === 'boolean') {
-      this.config.hints['transient'] = new Variant('b', hints.transient);
+      this[S.config].hints['transient'] = new Variant('b', hints.transient);
     }
     if (typeof hints.x === 'number') {
-      this.config.hints['x'] = new Variant('i', hints.x);
+      this[S.config].hints['x'] = new Variant('i', hints.x);
     }
     if (typeof hints.y === 'number') {
-      this.config.hints['y'] = new Variant('i', hints.y);
+      this[S.config].hints['y'] = new Variant('i', hints.y);
     }
     if (typeof hints.urgency === 'number') {
-      this.config.hints['urgency'] = new Variant('y', hints.urgency);
+      this[S.config].hints['urgency'] = new Variant('y', hints.urgency);
     }
   }
 
   addAction(actionText, callback) {
     const actionKey = identifier.next().value;
-    this.config.actions.push(actionKey, actionText);
+    this[S.config].actions.push(actionKey, actionText);
     this[S.actionCallbacks].set(actionKey, callback);
   }
 
@@ -205,14 +205,14 @@ class Notify {
 
   show() {
     const params = [
-      this.config.appName,
-      this.config.replacesId,
-      this.config.appIcon,
-      this.config.summary,
-      this.config.body,
-      this.config.actions,
-      this.config.hints,
-      this.config.timeout,
+      this[S.config].appName,
+      this[S.config].replacesId,
+      this[S.config].appIcon,
+      this[S.config].summary,
+      this[S.config].body,
+      this[S.config].actions,
+      this[S.config].hints,
+      this[S.config].timeout,
     ];
     return new Promise((resolve, reject) => {
       getInterface()
