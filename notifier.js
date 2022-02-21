@@ -204,6 +204,15 @@ class Notify {
     }
   }
 
+  removeAction(actionText) {
+    const x = this[S.config].actions.indexOf(actionText);
+    console.log(x);
+    if (x !== -1) {
+      this[S.config].actions.splice(x - 1, 2);
+    }
+    return this;
+  }
+
   show() {
     const params = [
       this[S.config].appName,

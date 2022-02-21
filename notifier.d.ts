@@ -46,6 +46,8 @@ export class Notify {
   close(): Promise<void>;
 
   show(): Promise<NotificationClosedResult>;
+
+  removeAction(actionText: string): this;
 }
 
 export const Config = {
