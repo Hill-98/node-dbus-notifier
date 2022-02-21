@@ -195,6 +195,7 @@ class Notify {
     const actionKey = identifier.next().value;
     this[S.config].actions.push(actionKey, actionText);
     this[S.actionCallbacks].set(actionKey, callback);
+    return this;
   }
 
   close() {

@@ -41,7 +41,7 @@ export class Notify {
 
   constructor(config: Partial<NotifyConfig>);
 
-  addAction(actionText: string, callback: () => void): void;
+  addAction(actionText: string, callback: () => void): this;
 
   close(): Promise<void>;
 
