@@ -192,7 +192,7 @@ class Notify {
   }
 
   addAction(actionText, callback) {
-    const actionKey = identifier.next().value;
+    const actionKey = '__action_key__::' + identifier.next().value;
     this[S.config].actions.push(actionKey, actionText);
     this[S.actionCallbacks].set(actionKey, callback);
     return this;
