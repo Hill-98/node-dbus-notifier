@@ -36,15 +36,13 @@ const disconnectSessionBus = function disconnectSessionBus() {
   if (!selfSessionBus) {
     return;
   }
+  // Save it for delayed disconnection.
+  const sessionBus = selfSessionBus;
+  selfSessionBus = undefined;
   // dbus-next bug
   // disconnecting the dbus connection immediately will throw an error, so let's delay the disconnection just in case.
   setTimeout(() => {
-    if (notificationCount > 0) {
-      return;
-    }
-    unsetNotifications();
-    selfSessionBus?.disconnect();
-    selfSessionBus = undefined;
+    sessionBus?.disconnect();
   }, 100);
 }
 
@@ -54,7 +52,8 @@ const actionInvoked = function actionInvoked(id, actionKey) {
 
 const notificationClosed = function notificationClosed(id, reason) {
   notifierEmitter.emit(`NotificationClosed:${id}`, reason);
-  if (Config.autoDisconnectSessionBus) {
+  if (Config.autoDisconnectSessionBus && selfSessionBus && notificationCount <= 0) {
+    unsetNotifications();
     disconnectSessionBus();
   }
 }
@@ -93,11 +92,10 @@ const getInterface = function getInterface() {
 }
 
 const setInterface = function setInterface(interface) {
+  unsetNotifications();
   if (interface) {
     disconnectSessionBus();
     bindNotifications(interface);
-  } else {
-    unsetNotifications();
   }
 }
 
