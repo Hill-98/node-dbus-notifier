@@ -1,3 +1,5 @@
+import { EventEmitter } from "stream";
+
 interface NotifyConfig {
   appName: string;
   replacesId: number;
@@ -34,7 +36,7 @@ export enum Status {
   closed = 2,
 }
 
-export class Notify {
+export class Notify extends EventEmitter {
   readonly id: number;
 
   readonly status: Status;
@@ -48,6 +50,21 @@ export class Notify {
   show(): Promise<NotificationClosedResult>;
 
   removeAction(actionText: string): this;
+
+  addListener(event: 'close', listener: (result: NotificationClosedResult) => void): this;
+  addListener(event: 'show', listener: (id: number) => void): this;
+  emit(event: 'close'): boolean;
+  emit(event: 'show'): boolean;
+  on(event: 'close', listener: (result: NotificationClosedResult) => void): this;
+  on(event: 'show', listener: (id: number) => void): this;
+  once(event: 'close', listener: (result: NotificationClosedResult) => void): this;
+  once(event: 'show', listener: (id: number) => void): this;
+  prependListener(event: 'close', listener: (result: NotificationClosedResult) => void): this;
+  prependListener(event: 'show', listener: (id: number) => void): this;
+  prependOnceListener(event: 'close', listener: (result: NotificationClosedResult) => void): this;
+  prependOnceListener(event: 'show', listener: (id: number) => void): this;
+  removeListener(event: 'close', listener: (result: NotificationClosedResult) => void): this;
+  removeListener(event: 'show', listener: (id: number) => void): this;
 }
 
 export const Config = {

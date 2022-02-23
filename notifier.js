@@ -119,7 +119,7 @@ const S = {
   status: Symbol('status'),
 }
 
-class Notify {
+class Notify extends EventEmitter {
   [S.id] = 0;
   [S.actionCallbacks] = new Map();
   [S.status] = 0;
@@ -142,6 +142,7 @@ class Notify {
   }
 
   constructor(config) {
+    super();
     this[S.config] = {
       appName: config.appName ?? 'node',
       replacesId: config.replacesId ?? 0,
@@ -235,13 +236,17 @@ class Notify {
                 notifierEmitter.off(`ActionInvoked:${id}`, actionInvoked);
                 this[S.status] = 2;
                 notificationCount -= 1;
+                const result = {
                   id,
                   reason,
-                });
+                };
+                this.emit('close', result);
+                resolve(result);
               });
               this[S.id] = id;
               this[S.status] = 1;
               notificationCount += 1;
+              this.emit('show', id);
             })
             .catch(reject);
         })
