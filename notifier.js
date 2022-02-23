@@ -6,7 +6,7 @@ const { Variant } = dbusNext;
 let externalSessionBus;
 let selfSessionBus;
 let Notifications;
-let NUMBER = 0;
+let notificationCount = 0;
 
 const Config = {
   autoDisconnectSessionBus: true,
@@ -39,7 +39,7 @@ const disconnectSessionBus = function disconnectSessionBus() {
   // dbus-next bug
   // disconnecting the dbus connection immediately will throw an error, so let's delay the disconnection just in case.
   setTimeout(() => {
-    if (NUMBER > 0) {
+    if (notificationCount > 0) {
       return;
     }
     unsetNotifications();
@@ -234,15 +234,14 @@ class Notify {
               notifierEmitter.once(`NotificationClosed:${id}`, (reason) => {
                 notifierEmitter.off(`ActionInvoked:${id}`, actionInvoked);
                 this[S.status] = 2;
-                NUMBER -= 1;
-                resolve({
+                notificationCount -= 1;
                   id,
                   reason,
                 });
               });
               this[S.id] = id;
               this[S.status] = 1;
-              NUMBER += 1;
+              notificationCount += 1;
             })
             .catch(reject);
         })
