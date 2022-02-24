@@ -6,7 +6,7 @@ const { Variant } = dbusNext;
 let externalSessionBus;
 let selfSessionBus;
 let Notifications;
-let notificationCount = 0;
+const notificationCounter = [];
 
 const Config = {
   autoDisconnectSessionBus: true,
@@ -34,11 +34,6 @@ const actionInvoked = function actionInvoked(id, actionKey) {
 
 const notificationClosed = function notificationClosed(id, reason) {
   notifierEmitter.emit(`NotificationClosed:${id}`, reason);
-  if (Config.autoDisconnectSessionBus && selfSessionBus && notificationCount <= 0) {
-    // eslint-disable-next-line no-use-before-define
-    unsetNotifications();
-    disconnectSessionBus();
-  }
 };
 
 const bindNotifications = function bindNotifications(notificationInterface) {
@@ -117,6 +112,18 @@ const S = {
   id: Symbol('id'),
   status: Symbol('status'),
 };
+
+notifierEmitter.on('push', () => {
+  notificationCounter.push(true);
+});
+
+notifierEmitter.on('pop', () => {
+  notificationCounter.pop();
+  if (Config.autoDisconnectSessionBus && selfSessionBus && notificationCounter.length === 0) {
+    unsetNotifications();
+    disconnectSessionBus();
+  }
+});
 
 class Notify extends EventEmitter {
   [S.id] = 0;
@@ -241,8 +248,7 @@ class Notify extends EventEmitter {
               notifierEmitter.on(`ActionInvoked:${id}`, invoked);
               notifierEmitter.once(`NotificationClosed:${id}`, (reason) => {
                 notifierEmitter.off(`ActionInvoked:${id}`, invoked);
-                this[S.status] = 2;
-                notificationCount -= 1;
+                notifierEmitter.emit('pop');
                 const result = {
                   id,
                   reason,
@@ -251,8 +257,7 @@ class Notify extends EventEmitter {
                 resolve(result);
               });
               this[S.id] = id;
-              this[S.status] = 1;
-              notificationCount += 1;
+              notifierEmitter.emit('push');
               this.emit('show', id);
             })
             .catch(reject);
