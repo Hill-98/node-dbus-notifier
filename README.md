@@ -2,7 +2,7 @@
 
 This is my first NodeJS library, more introductions are coming...
 
-**Requires NodeJS 15+ to work, and will run on lower NodeJS versions in the future.**
+**Requires NodeJS 12+ to work**
 
 Thanks to [dbusjs/node-dbus-next](https://github.com/dbusjs/node-dbus-next)
 

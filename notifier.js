@@ -1,7 +1,5 @@
 const EventEmitter = require('events');
-const dbusNext = require('dbus-next');
-
-const { Variant } = dbusNext;
+const { sessionBus: SessionBus, Variant } = require('dbus-next');
 
 let externalSessionBus;
 let selfSessionBus;
@@ -24,7 +22,7 @@ const disconnectSessionBus = function disconnectSessionBus() {
   // dbus-next bug
   // disconnecting the dbus connection immediately will throw an error, so let's delay the disconnection just in case.
   setTimeout(() => {
-    sessionBus?.disconnect();
+    sessionBus.disconnect();
   }, 100);
 };
 
@@ -46,8 +44,11 @@ const bindNotifications = function bindNotifications(notificationInterface) {
 };
 
 const unsetNotifications = function unsetNotifications() {
-  Notifications?.off('ActionInvoked', actionInvoked);
-  Notifications?.off('NotificationClosed', notificationClosed);
+  if (!Notifications) {
+    return;
+  }
+  Notifications.off('ActionInvoked', actionInvoked);
+  Notifications.off('NotificationClosed', notificationClosed);
   Notifications = undefined;
 };
 
@@ -55,7 +56,9 @@ const getSessionBus = function getSessionBus() {
   if (externalSessionBus) {
     return externalSessionBus;
   }
-  selfSessionBus ??= dbusNext.sessionBus();
+  if (!selfSessionBus) {
+    selfSessionBus = SessionBus();
+  }
   return selfSessionBus;
 };
 
@@ -86,8 +89,8 @@ const getInterface = function getInterface() {
 
 const setInterface = function setInterface(notificationInterface) {
   unsetNotifications();
+  disconnectSessionBus();
   if (notificationInterface) {
-    disconnectSessionBus();
     bindNotifications(notificationInterface);
   } else {
     // Get a new one to continue processing old events.
@@ -105,14 +108,6 @@ const genIdentifier = function* genIdentifier() {
 };
 const identifier = genIdentifier();
 
-const S = {
-  actionCallbacks: Symbol('actionsCallback'),
-  actionInvoked: Symbol('ActionInvoked'),
-  config: Symbol('config'),
-  id: Symbol('id'),
-  status: Symbol('status'),
-};
-
 notifierEmitter.on('push', () => {
   notificationCounter.push(true);
 });
@@ -125,129 +120,131 @@ notifierEmitter.on('pop', () => {
   }
 });
 
+const actionInvokedSymbol = Symbol('actionInvoked');
+
 class Notify extends EventEmitter {
-  [S.id] = 0;
+  #id = 0;
 
-  [S.actionCallbacks] = new Map();
+  #status = 0;
 
-  [S.status] = 0;
+  #actionCallbacks = new Map();
 
-  [S.config] = {};
+  #config = {};
 
-  [S.actionInvoked](actionKey) {
-    const callback = this[S.actionCallbacks].get(actionKey);
+  [actionInvokedSymbol](actionKey) {
+    const callback = this.#actionCallbacks.get(actionKey);
     if (callback) {
       callback();
     }
   }
 
   get id() {
-    return this[S.id];
+    return this.#id;
   }
 
   get status() {
-    return this[S.status];
+    return this.#status;
   }
 
   constructor(config) {
     super();
-    this[S.config] = {
-      appName: config.appName ?? 'node',
-      replacesId: config.replacesId ?? 0,
-      appIcon: config.appIcon ?? '',
-      summary: config.summary ?? '',
-      body: config.body ?? '',
+    this.#config = {
+      appName: config.appName || '',
+      replacesId: config.replacesId || 0,
+      appIcon: config.appIcon || '',
+      summary: config.summary || '',
+      body: config.body || '',
       actions: [],
       hints: {},
-      timeout: config.timeout ?? 0,
+      timeout: config.timeout || 0,
     };
-    const hints = config.hints ?? {};
+    const hints = config.hints || {};
     if (typeof hints.actionIcons === 'boolean') {
-      this[S.config].hints['action-icons'] = new Variant('b', hints.actionIcons);
+      this.#config.hints['action-icons'] = new Variant('b', hints.actionIcons);
     }
     if (typeof hints.category === 'string') {
       // eslint-disable-next-line dot-notation
-      this[S.config].hints['category'] = new Variant('s', hints.category);
+      this.#config.hints['category'] = new Variant('s', hints.category);
     }
     if (typeof hints.desktopEntry === 'string') {
-      this[S.config].hints['desktop-entry'] = new Variant('s', hints.desktopEntry);
+      this.#config.hints['desktop-entry'] = new Variant('s', hints.desktopEntry);
     }
     if (typeof hints.imagePath === 'string') {
-      this[S.config].hints['image-path'] = new Variant('s', hints.imagePath);
+      this.#config.hints['image-path'] = new Variant('s', hints.imagePath);
     }
     if (typeof hints.resident === 'boolean') {
       // eslint-disable-next-line dot-notation
-      this[S.config].hints['resident'] = new Variant('b', hints.resident);
+      this.#config.hints['resident'] = new Variant('b', hints.resident);
     }
     if (typeof hints.soundFile === 'string') {
-      this[S.config].hints['sound-file'] = new Variant('s', hints.soundFile);
+      this.#config.hints['sound-file'] = new Variant('s', hints.soundFile);
     }
     if (typeof hints.soundName === 'string') {
-      this[S.config].hints['sound-name'] = new Variant('s', hints.soundName);
+      this.#config.hints['sound-name'] = new Variant('s', hints.soundName);
     }
     if (typeof hints.suppressSound === 'boolean') {
-      this[S.config].hints['suppress-sound'] = new Variant('b', hints.suppressSound);
+      this.#config.hints['suppress-sound'] = new Variant('b', hints.suppressSound);
     }
     if (typeof hints.transient === 'boolean') {
       // eslint-disable-next-line dot-notation
-      this[S.config].hints['transient'] = new Variant('b', hints.transient);
+      this.#config.hints['transient'] = new Variant('b', hints.transient);
     }
     if (typeof hints.x === 'number') {
       // eslint-disable-next-line dot-notation
-      this[S.config].hints['x'] = new Variant('i', hints.x);
+      this.#config.hints['x'] = new Variant('i', hints.x);
     }
     if (typeof hints.y === 'number') {
       // eslint-disable-next-line dot-notation
-      this[S.config].hints['y'] = new Variant('i', hints.y);
+      this.#config.hints['y'] = new Variant('i', hints.y);
     }
     if (typeof hints.urgency === 'number') {
       // eslint-disable-next-line dot-notation
-      this[S.config].hints['urgency'] = new Variant('y', hints.urgency);
+      this.#config.hints['urgency'] = new Variant('y', hints.urgency);
     }
   }
 
   addAction(actionText, callback) {
     const actionKey = `__action_key__::${identifier.next().value}`;
-    this[S.config].actions.push(actionKey, actionText);
-    this[S.actionCallbacks].set(actionKey, callback);
+    this.#config.actions.push(actionKey, actionText);
+    this.#actionCallbacks.set(actionKey, callback);
     return this;
   }
 
   close() {
-    if (this[S.id] !== 0) {
-      return getInterface().CloseNotification(this[S.id]);
+    if (this.#id !== 0) {
+      return getInterface().CloseNotification(this.#id);
     }
     return Promise.resolve();
   }
 
   removeAction(actionText) {
-    const x = this[S.config].actions.indexOf(actionText);
+    const x = this.#config.actions.indexOf(actionText);
     if (x !== -1) {
-      this[S.config].actions.splice(x - 1, 2);
+      this.#config.actions.splice(x - 1, 2);
     }
     return this;
   }
 
   show() {
     const params = [
-      this[S.config].appName,
-      this[S.config].replacesId,
-      this[S.config].appIcon,
-      this[S.config].summary,
-      this[S.config].body,
-      this[S.config].actions,
-      this[S.config].hints,
-      this[S.config].timeout,
+      this.#config.appName,
+      this.#config.replacesId,
+      this.#config.appIcon,
+      this.#config.summary,
+      this.#config.body,
+      this.#config.actions,
+      this.#config.hints,
+      this.#config.timeout,
     ];
     return new Promise((resolve, reject) => {
       getInterface()
         .then((i) => {
           i.Notify(...params)
             .then((id) => {
-              const invoked = this[S.actionInvoked].bind(this);
+              const invoked = this[actionInvokedSymbol].bind(this);
               notifierEmitter.on(`ActionInvoked:${id}`, invoked);
               notifierEmitter.once(`NotificationClosed:${id}`, (reason) => {
-                this[S.status] = 2;
+                this.#status = 2;
                 notifierEmitter.off(`ActionInvoked:${id}`, invoked);
                 notifierEmitter.emit('pop');
                 const result = {
@@ -257,8 +254,8 @@ class Notify extends EventEmitter {
                 this.emit('close', result);
                 resolve(result);
               });
-              this[S.id] = id;
-              this[S.status] = 1;
+              this.#id = id;
+              this.#status = 1;
               notifierEmitter.emit('push');
               this.emit('show', id);
             })
