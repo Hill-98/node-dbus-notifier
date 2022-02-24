@@ -18,7 +18,7 @@ Using yarn: `yarn add node-dbus-notifier`
 
 ## Examples
 
-Make sure your current system supports DBus and has a provider that conforms to the [Desktop Notifications Specification](Desktop Notifications Specification) before using it.
+Make sure your current system supports DBus and has a provider that conforms to the [Desktop Notifications Specification](https://specifications.freedesktop.org/notification-spec/latest/) before using it.
 
 ### simple notification
 
