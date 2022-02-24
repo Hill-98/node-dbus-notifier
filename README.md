@@ -147,4 +147,4 @@ If no arguments are passed, the internal session will be reused.
 
 ## Thanks
 
-Thanks to [dbusjs/node-dbus-next]([GitHub - dbusjs/node-dbus-next: 🚌 The next great dbus library for node](https://github.com/dbusjs/node-dbus-next)) for the DBus session support.
+Thanks to [dbusjs/node-dbus-next](https://github.com/dbusjs/node-dbus-next) for the DBus session support.
