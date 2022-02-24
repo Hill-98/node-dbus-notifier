@@ -14,24 +14,6 @@ const Config = {
 
 const notifierEmitter = new EventEmitter();
 
-const getSessionBus = function getSessionBus() {
-  if (externalSessionBus) {
-    return externalSessionBus;
-  }
-  selfSessionBus ??= dbusNext.sessionBus();
-  return selfSessionBus;
-}
-
-const setSessionBus = function setSessionBus(sessionBus) {
-  if (selfSessionBus) {
-    selfSessionBus.disconnect();
-    selfSessionBus = undefined;
-  }
-  externalSessionBus = sessionBus;
-  Config.autoDisconnectSessionBus = Config.autoDisconnectSessionBus && !sessionBus;
-  Notifications = undefined;
-}
-
 const disconnectSessionBus = function disconnectSessionBus() {
   if (!selfSessionBus) {
     return;
@@ -71,6 +53,21 @@ const unsetNotifications = function unsetNotifications() {
   Notifications?.off('ActionInvoked', actionInvoked);
   Notifications?.off('NotificationClosed', notificationClosed);
   Notifications = undefined;
+}
+
+const getSessionBus = function getSessionBus() {
+  if (externalSessionBus) {
+    return externalSessionBus;
+  }
+  selfSessionBus ??= dbusNext.sessionBus();
+  return selfSessionBus;
+}
+
+const setSessionBus = function setSessionBus(sessionBus) {
+  unsetNotifications();
+  disconnectSessionBus();
+  externalSessionBus = sessionBus;
+  Config.autoDisconnectSessionBus = Config.autoDisconnectSessionBus && !sessionBus;
 }
 
 const getInterface = function getInterface() {
