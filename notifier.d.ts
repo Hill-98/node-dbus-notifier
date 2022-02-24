@@ -75,7 +75,7 @@ export function disconnectSessionBus(): void;
 
 export function getInterface(): any;
 
-export function setInterface(interface?: any): void;
+export function setInterface(notificationInterface?: any): void;
 
 export function getSessionBus(): any;
 

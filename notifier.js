@@ -26,34 +26,35 @@ const disconnectSessionBus = function disconnectSessionBus() {
   setTimeout(() => {
     sessionBus?.disconnect();
   }, 100);
-}
+};
 
 const actionInvoked = function actionInvoked(id, actionKey) {
   notifierEmitter.emit(`ActionInvoked:${id}`, actionKey);
-}
+};
 
 const notificationClosed = function notificationClosed(id, reason) {
   notifierEmitter.emit(`NotificationClosed:${id}`, reason);
   if (Config.autoDisconnectSessionBus && selfSessionBus && notificationCount <= 0) {
+    // eslint-disable-next-line no-use-before-define
     unsetNotifications();
     disconnectSessionBus();
   }
-}
+};
 
-const bindNotifications = function bindNotifications(interface) {
+const bindNotifications = function bindNotifications(notificationInterface) {
   // Since the NotificationClosed event will fire when any notification is closed
-  // using ID to trigger the event here allows us to use once() elsewhere without binding too many events
-  Notifications = interface;
-  Notifications.on('ActionInvoked', actionInvoked);
-  Notifications.on('NotificationClosed', notificationClosed);
+  // using ID to trigger the event here allows us to use once() elsewhere without binding too many events.
+  notificationInterface.on('ActionInvoked', actionInvoked);
+  notificationInterface.on('NotificationClosed', notificationClosed);
+  Notifications = notificationInterface;
   return Notifications;
-}
+};
 
 const unsetNotifications = function unsetNotifications() {
   Notifications?.off('ActionInvoked', actionInvoked);
   Notifications?.off('NotificationClosed', notificationClosed);
   Notifications = undefined;
-}
+};
 
 const getSessionBus = function getSessionBus() {
   if (externalSessionBus) {
@@ -61,14 +62,14 @@ const getSessionBus = function getSessionBus() {
   }
   selfSessionBus ??= dbusNext.sessionBus();
   return selfSessionBus;
-}
+};
 
 const setSessionBus = function setSessionBus(sessionBus) {
   unsetNotifications();
   disconnectSessionBus();
   externalSessionBus = sessionBus;
   Config.autoDisconnectSessionBus = Config.autoDisconnectSessionBus && !sessionBus;
-}
+};
 
 const getInterface = function getInterface() {
   if (Notifications) {
@@ -86,27 +87,27 @@ const getInterface = function getInterface() {
         reject(err);
       });
   });
-}
+};
 
-const setInterface = function setInterface(interface) {
+const setInterface = function setInterface(notificationInterface) {
   unsetNotifications();
-  if (interface) {
+  if (notificationInterface) {
     disconnectSessionBus();
-    bindNotifications(interface);
+    bindNotifications(notificationInterface);
   } else {
     // Get a new one to continue processing old events.
     getInterface();
   }
-}
+};
 
 const genIdentifier = function* genIdentifier() {
   let IX = 0;
-  while(true) {
+  while (true) {
     IX = IX >= 25 ? 0 : IX + 1;
     const ide = String.fromCharCode(64 + IX);
     yield ide;
-  };
-}
+  }
+};
 const identifier = genIdentifier();
 
 const S = {
@@ -115,11 +116,13 @@ const S = {
   config: Symbol('config'),
   id: Symbol('id'),
   status: Symbol('status'),
-}
+};
 
 class Notify extends EventEmitter {
   [S.id] = 0;
+
   [S.actionCallbacks] = new Map();
+
   [S.status] = 0;
 
   [S.config] = {};
@@ -150,12 +153,13 @@ class Notify extends EventEmitter {
       actions: [],
       hints: {},
       timeout: config.timeout ?? 0,
-    }
+    };
     const hints = config.hints ?? {};
     if (typeof hints.actionIcons === 'boolean') {
       this[S.config].hints['action-icons'] = new Variant('b', hints.actionIcons);
     }
     if (typeof hints.category === 'string') {
+      // eslint-disable-next-line dot-notation
       this[S.config].hints['category'] = new Variant('s', hints.category);
     }
     if (typeof hints.desktopEntry === 'string') {
@@ -165,6 +169,7 @@ class Notify extends EventEmitter {
       this[S.config].hints['image-path'] = new Variant('s', hints.imagePath);
     }
     if (typeof hints.resident === 'boolean') {
+      // eslint-disable-next-line dot-notation
       this[S.config].hints['resident'] = new Variant('b', hints.resident);
     }
     if (typeof hints.soundFile === 'string') {
@@ -177,35 +182,39 @@ class Notify extends EventEmitter {
       this[S.config].hints['suppress-sound'] = new Variant('b', hints.suppressSound);
     }
     if (typeof hints.transient === 'boolean') {
+      // eslint-disable-next-line dot-notation
       this[S.config].hints['transient'] = new Variant('b', hints.transient);
     }
     if (typeof hints.x === 'number') {
+      // eslint-disable-next-line dot-notation
       this[S.config].hints['x'] = new Variant('i', hints.x);
     }
     if (typeof hints.y === 'number') {
+      // eslint-disable-next-line dot-notation
       this[S.config].hints['y'] = new Variant('i', hints.y);
     }
     if (typeof hints.urgency === 'number') {
+      // eslint-disable-next-line dot-notation
       this[S.config].hints['urgency'] = new Variant('y', hints.urgency);
     }
   }
 
   addAction(actionText, callback) {
-    const actionKey = '__action_key__::' + identifier.next().value;
+    const actionKey = `__action_key__::${identifier.next().value}`;
     this[S.config].actions.push(actionKey, actionText);
     this[S.actionCallbacks].set(actionKey, callback);
     return this;
   }
 
   close() {
-    if (this[S.id] != 0) {
+    if (this[S.id] !== 0) {
       return getInterface().CloseNotification(this[S.id]);
     }
+    return Promise.resolve();
   }
 
   removeAction(actionText) {
     const x = this[S.config].actions.indexOf(actionText);
-    console.log(x);
     if (x !== -1) {
       this[S.config].actions.splice(x - 1, 2);
     }
@@ -228,10 +237,10 @@ class Notify extends EventEmitter {
         .then((i) => {
           i.Notify(...params)
             .then((id) => {
-              const actionInvoked = this[S.actionInvoked].bind(this);
-              notifierEmitter.on(`ActionInvoked:${id}`, actionInvoked);
+              const invoked = this[S.actionInvoked].bind(this);
+              notifierEmitter.on(`ActionInvoked:${id}`, invoked);
               notifierEmitter.once(`NotificationClosed:${id}`, (reason) => {
-                notifierEmitter.off(`ActionInvoked:${id}`, actionInvoked);
+                notifierEmitter.off(`ActionInvoked:${id}`, invoked);
                 this[S.status] = 2;
                 notificationCount -= 1;
                 const result = {
