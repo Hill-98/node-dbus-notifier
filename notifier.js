@@ -247,6 +247,7 @@ class Notify extends EventEmitter {
               const invoked = this[S.actionInvoked].bind(this);
               notifierEmitter.on(`ActionInvoked:${id}`, invoked);
               notifierEmitter.once(`NotificationClosed:${id}`, (reason) => {
+                this[S.status] = 2;
                 notifierEmitter.off(`ActionInvoked:${id}`, invoked);
                 notifierEmitter.emit('pop');
                 const result = {
@@ -257,6 +258,7 @@ class Notify extends EventEmitter {
                 resolve(result);
               });
               this[S.id] = id;
+              this[S.status] = 1;
               notifierEmitter.emit('push');
               this.emit('show', id);
             })
