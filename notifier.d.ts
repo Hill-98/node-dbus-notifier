@@ -1,6 +1,7 @@
-import { EventEmitter } from "stream";
+import { ClientInterface, MessageBus } from 'dbus-next';
+import { EventEmitter } from 'stream';
 
-interface NotifyConfig {
+export interface NotifyConfig {
   appName: string;
   replacesId: number;
   appIcon: string;
@@ -10,7 +11,7 @@ interface NotifyConfig {
   timeout: number;
 }
 
-interface NotificationClosedResult {
+export interface NotificationClosedResult {
   id: number;
   reason: number;
 }
@@ -53,8 +54,8 @@ export class Notify extends EventEmitter {
 
   addListener(event: 'close', listener: (result: NotificationClosedResult) => void): this;
   addListener(event: 'show', listener: (id: number) => void): this;
-  emit(event: 'close'): boolean;
-  emit(event: 'show'): boolean;
+  emit(event: 'close', result: NotificationClosedResult): boolean;
+  emit(event: 'show', id: number): boolean;
   on(event: 'close', listener: (result: NotificationClosedResult) => void): this;
   on(event: 'show', listener: (id: number) => void): this;
   once(event: 'close', listener: (result: NotificationClosedResult) => void): this;
@@ -67,16 +68,18 @@ export class Notify extends EventEmitter {
   removeListener(event: 'show', listener: (id: number) => void): this;
 }
 
-export const Config = {
-  autoDisconnectSessionBus: boolean,
+export interface ConfigInterface  {
+  autoDisconnectSessionBus: boolean;
 }
+
+export const Config: ConfigInterface;
 
 export function disconnectSessionBus(): void;
 
-export function getInterface(): any;
+export function getInterface(): ClientInterface;
 
-export function setInterface(notificationInterface?: any): void;
+export function setInterface(notificationInterface?: ClientInterface): void;
 
-export function getSessionBus(): any;
+export function getSessionBus(): MessageBus;
 
-export function setSessionBus(sessionBus?: any): void;
+export function setSessionBus(sessionBus?: MessageBus): void;
