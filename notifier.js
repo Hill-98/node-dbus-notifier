@@ -4,6 +4,7 @@ const { sessionBus: SessionBus, Variant } = require('dbus-next');
 let externalSessionBus;
 let selfSessionBus;
 let Notifications;
+let getInterfaceStat = false;
 const notificationCounter = [];
 
 const Config = {
@@ -73,16 +74,29 @@ const getInterface = function getInterface() {
   if (Notifications) {
     return Promise.resolve(Notifications);
   }
+  if (getInterfaceStat) {
+    return new Promise((resolve, reject) => {
+      notifierEmitter.once('getInterface', resolve);
+      notifierEmitter.once('getInterfaceError', reject);
+    });
+  }
+  getInterfaceStat = true;
   return new Promise((reslove, reject) => {
     getSessionBus().getProxyObject('org.freedesktop.Notifications', '/org/freedesktop/Notifications')
       .then((obj) => {
-        reslove(bindNotifications(obj.getInterface('org.freedesktop.Notifications')));
+        const i = bindNotifications(obj.getInterface('org.freedesktop.Notifications'));
+        notifierEmitter.emit('getInterface', i);
+        reslove(i);
       })
       .catch((err) => {
         if (Config.autoDisconnectSessionBus) {
           disconnectSessionBus();
         }
+        notifierEmitter.emit('getInterfaceError', err);
         reject(err);
+      })
+      .finally(() => {
+        getInterfaceStat = false;
       });
   });
 };
