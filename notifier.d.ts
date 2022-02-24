@@ -1,19 +1,17 @@
 import { ClientInterface, MessageBus } from 'dbus-next';
 import { EventEmitter } from 'stream';
 
-export interface NotifyConfig {
-  appName: string;
-  replacesId: number;
-  appIcon: string;
-  summary: string;
-  body: string;
-  hints: Partial<Hints>;
-  timeout: number;
+export enum Status {
+  unopen = 0,
+  opend = 1,
+  closed = 2,
 }
 
-export interface NotificationClosedResult {
-  id: number;
-  reason: number;
+export enum Reason {
+  expired = 1,
+  closeByUser = 2,
+  closeByCall = 3,
+  undefined = 4,
 }
 
 export interface Hints {
@@ -31,10 +29,19 @@ export interface Hints {
   urgency: number;
 }
 
-export enum Status {
-  unopen = 0,
-  opend = 1,
-  closed = 2,
+export interface NotifyConfig {
+  appName: string;
+  replacesId: number;
+  appIcon: string;
+  summary: string;
+  body: string;
+  hints: Partial<Hints>;
+  timeout: number;
+}
+
+export interface NotificationClosedResult {
+  id: number;
+  reason: Reason;
 }
 
 export class Notify extends EventEmitter {
