@@ -93,6 +93,9 @@ const setInterface = function setInterface(interface) {
   if (interface) {
     disconnectSessionBus();
     bindNotifications(interface);
+  } else {
+    // Get a new one to continue processing old events.
+    getInterface();
   }
 }
 
