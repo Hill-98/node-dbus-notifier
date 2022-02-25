@@ -78,7 +78,7 @@ notify.show();
 
 See the [DBus protocol](https://specifications.freedesktop.org/notification-spec/latest/ar01s09.html) of the [Desktop Notifications Specification](https://specifications.freedesktop.org/notification-spec/latest/) for more information.
 
-### Usage
+## Usage
 
 > The node-dbus-notifier creates a DBus session by default when the first notification is displayed and disconnects the DBus session when there are no notifications; if the session is not disconnected, the app will not exit properly.
 > 
