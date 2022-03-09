@@ -15,5 +15,5 @@ module.exports = {
         code: 120,
       },
     ],
-  }
+  },
 };

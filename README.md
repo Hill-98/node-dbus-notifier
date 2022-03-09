@@ -45,7 +45,7 @@ const { Notify } = require('node-dbus-notifier');
 
 const notify = new Notify({
   appName: 'My App',
-  appIcon: 'text-html', // The availability of icons depends on the current system icon set.
+  appIcon: 'application-javascript', // The availability of icons depends on the current system icon set.
   summary: 'This is summary',
   body: 'This is body',
   timeout: 3000,

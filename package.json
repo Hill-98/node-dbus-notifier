@@ -1,6 +1,6 @@
 {
   "name": "node-dbus-notifier",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "DBus-based desktop notifications with full feature support",
   "keywords": [
     "dbus",
@@ -23,6 +23,9 @@
   },
   "author": "Zhong Lufan",
   "license": "MIT",
+  "scripts": {
+    "lint": "eslint ."
+  },
   "engines": {
     "node": ">= 12.0.0"
   },
@@ -31,7 +34,7 @@
   },
   "devDependencies": {
     "@types/node": "^17.0.21",
-    "eslint": "^8.9.0",
+    "eslint": "^8.10.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.25.4"
   }
