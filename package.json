@@ -12,11 +12,10 @@
     "LICENSE",
     "README.md",
     "index.js",
-    "notifier.js",
-    "notifier.d.ts"
+    "index.d.ts"
   ],
-  "main": "notifier.js",
-  "types": "notifier.d.js",
+  "main": "index.js",
+  "types": "index.d.js",
   "homepage": "https://github.com/Hill-98/node-dbus-notifier",
   "repository": "github:Hill-98/node-dbus-notifier",
   "bugs": {
