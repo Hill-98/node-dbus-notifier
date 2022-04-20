@@ -5,6 +5,7 @@ let externalSessionBus;
 let selfSessionBus;
 let Notifications;
 let getInterfaceStat = false;
+let supportsInlineReply;
 const notificationCounter = [];
 
 const Config = {
@@ -35,11 +36,20 @@ const notificationClosed = function notificationClosed(id, reason) {
   notifierEmitter.emit(`NotificationClosed:${id}`, reason);
 };
 
+const notificationReplied = function notificationReplied(id, reply) {
+  notifierEmitter.emit(`NotificationReplied:${id}`, reply);
+};
+
 const bindNotifications = function bindNotifications(notificationInterface) {
   // Since the NotificationClosed event will fire when any notification is closed
   // using ID to trigger the event here allows us to use once() elsewhere without binding too many events.
   notificationInterface.on('ActionInvoked', actionInvoked);
   notificationInterface.on('NotificationClosed', notificationClosed);
+  Notify.supportsInlineReply().then((supported) => {
+    if(supported) {
+      notificationInterface.on('NotificationReplied', notificationReplied);
+    }
+  });
   Notifications = notificationInterface;
   return Notifications;
 };
@@ -50,6 +60,7 @@ const unsetNotifications = function unsetNotifications() {
   }
   Notifications.off('ActionInvoked', actionInvoked);
   Notifications.off('NotificationClosed', notificationClosed);
+  Notifications.off('NotificationReplied', notificationReplied);
   Notifications = undefined;
 };
 
@@ -152,6 +163,24 @@ class Notify extends EventEmitter {
     }
   }
 
+  static supportsInlineReply() {
+    return new Promise((resolve, reject) => {
+      if(typeof supportsInlineReply !== 'undefined') {
+        return resolve(supportsInlineReply);
+      }
+      getInterface()
+        .then((i) => {
+          i.GetCapabilities()
+            .then((capabilities) => {
+              supportsInlineReply = capabilities.includes('inline-reply');
+              resolve(supportsInlineReply);
+            })
+            .catch(reject);
+        })
+        .catch(reject);
+    });
+  }
+
   get id() {
     return this.#id;
   }
@@ -224,6 +253,13 @@ class Notify extends EventEmitter {
     return this;
   }
 
+  addInlineReply(actionText, callback) {
+    const actionKey = 'inline-reply';
+    this.#config.actions.push(actionKey, actionText);
+    this.#actionCallbacks.set(actionKey, callback);
+    return this;
+  }
+
   close() {
     if (this.#id !== 0) {
       return getInterface().CloseNotification(this.#id);
@@ -256,10 +292,20 @@ class Notify extends EventEmitter {
           i.Notify(...params)
             .then((id) => {
               const invoked = this[actionInvokedSymbol].bind(this);
+              const replied = (reply) => {
+                const callback = this.#actionCallbacks.get('inline-reply');
+                if (callback) {
+                  callback(reply);
+                }
+              };
+
               notifierEmitter.on(`ActionInvoked:${id}`, invoked);
+              notifierEmitter.on(`NotificationReplied:${id}`, replied);
+
               notifierEmitter.once(`NotificationClosed:${id}`, (reason) => {
                 this.#status = 2;
                 notifierEmitter.off(`ActionInvoked:${id}`, invoked);
+                notifierEmitter.off(`NotificationReplied:${id}`, replied);
                 notifierEmitter.emit('pop');
                 const result = {
                   id,
