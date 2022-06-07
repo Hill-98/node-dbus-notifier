@@ -68,6 +68,8 @@ export class Notify extends EventEmitter {
 
   show(): Promise<NotificationClosedResult>;
 
+  static supportedFeatures(): Promise<string[]>;
+
   addListener(event: 'close', listener: (result: NotificationClosedResult) => void): this;
 
   addListener(event: 'show', listener: (id: number) => void): this;

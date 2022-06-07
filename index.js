@@ -300,6 +300,20 @@ class Notify extends EventEmitter {
         .catch(reject);
     });
   }
+
+  static supportedFeatures() {
+    return new Promise((resolve, reject) => {
+      getInterface()
+        .then((i) => {
+          i.GetCapabilities()
+            .then((caps) => {
+              resolve(caps);
+            })
+            .catch(reject);
+        })
+        .catch(reject);
+    });
+  }
 }
 
 module.exports = {
