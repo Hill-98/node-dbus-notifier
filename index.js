@@ -141,14 +141,14 @@ class Notify extends EventEmitter {
 
   #status = 0;
 
-  #actionCallbacks = new Map();
+  #actions = new Map();
 
   #config = {};
 
-  [actionInvokedSymbol](actionKey) {
-    const callback = this.#actionCallbacks.get(actionKey);
-    if (callback) {
-      callback();
+  [actionInvokedSymbol](key) {
+    const action = this.#actions.get(key);
+    if (typeof action.callback === 'function') {
+      action.callback();
     }
   }
 
@@ -217,11 +217,20 @@ class Notify extends EventEmitter {
     }
   }
 
-  addAction(actionText, callback) {
-    const actionKey = `__action_key__::${identifier.next().value}`;
-    this.#config.actions.push(actionKey, actionText);
-    this.#actionCallbacks.set(actionKey, callback);
-    return this;
+  addAction(text, key, callback) {
+    const actionCallback = callback === undefined ? key : callback;
+    const actionKey = callback === undefined ? `__action_key__::${identifier.next().value}` : key.toString();
+    if (typeof actionCallback !== 'function') {
+      throw new TypeError('callback is not a function.');
+    }
+    if (this.#actions.has(actionKey)) {
+      throw new Error(`'${actionKey}' action already exists.`);
+    }
+    this.#actions.set(actionKey, {
+      text: text.toString(),
+      callback: actionCallback,
+    });
+    return actionKey;
   }
 
   close() {
@@ -231,22 +240,22 @@ class Notify extends EventEmitter {
     return Promise.resolve();
   }
 
-  removeAction(actionText) {
-    const x = this.#config.actions.indexOf(actionText);
-    if (x !== -1) {
-      this.#config.actions.splice(x - 1, 2);
-    }
-    return this;
+  removeAction(key) {
+    return this.#actions.delete(key);
   }
 
   show() {
+    const actions = [];
+    this.#actions.forEach((item, key) => {
+      actions.push(key, item.text);
+    });
     const params = [
       this.#config.appName,
       this.#config.replacesId,
       this.#config.appIcon,
       this.#config.summary,
       this.#config.body,
-      this.#config.actions,
+      actions,
       this.#config.hints,
       this.#config.timeout,
     ];

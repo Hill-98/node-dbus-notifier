@@ -51,13 +51,14 @@ export class Notify extends EventEmitter {
 
   constructor(config: Partial<NotifyConfig>);
 
-  addAction(actionText: string, callback: () => void): this;
+  addAction(text: string, callback: () => void): string;
+  addAction(text: string, key: string, callback: () => void): string;
 
   close(): Promise<void>;
 
   show(): Promise<NotificationClosedResult>;
 
-  removeAction(actionText: string): this;
+  removeAction(key: string): boolean;
 
   addListener(event: 'close', listener: (result: NotificationClosedResult) => void): this;
   addListener(event: 'show', listener: (id: number) => void): this;
