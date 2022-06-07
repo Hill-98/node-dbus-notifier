@@ -58,6 +58,8 @@ export class Notify extends EventEmitter {
 
   addAction(text: string, key: string, callback: () => void): string;
 
+  addAction(text: string, key: 'inline-reply', callback: (message: string) => void): string;
+
   close(): Promise<void>;
 
   removeAction(key: string): boolean;

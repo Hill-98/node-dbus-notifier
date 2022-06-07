@@ -2,6 +2,11 @@ const EventEmitter = require('events');
 const { sessionBus: SessionBus, Variant } = require('dbus-next');
 
 const ActionInvokedSymbol = Symbol('actionInvoked');
+const ActionEvents = Object.freeze({
+  ActionInvoked: 'ActionInvoked',
+  NotificationClosed: 'NotificationClosed',
+  NotificationReplied: 'NotificationReplied',
+});
 const ActionKeys = Object.freeze({
   DEFAULT: 'default',
 });
@@ -33,18 +38,23 @@ const disconnectSessionBus = function disconnectSessionBus() {
 };
 
 const actionInvoked = function actionInvoked(id, actionKey) {
-  notifierEmitter.emit(`ActionInvoked:${id}`, actionKey);
+  notifierEmitter.emit(`${ActionEvents.ActionInvoked}:${id}`, actionKey);
 };
 
 const notificationClosed = function notificationClosed(id, reason) {
-  notifierEmitter.emit(`NotificationClosed:${id}`, reason);
+  notifierEmitter.emit(`${ActionEvents.NotificationClosed}:${id}`, reason);
+};
+
+const notificationReplied = function notificationReplied(id, reason) {
+  notifierEmitter.emit(`${ActionEvents.NotificationReplied}:${id}`, reason);
 };
 
 const bindNotifications = function bindNotifications(notificationInterface) {
   // Since the NotificationClosed event will fire when any notification is closed
   // using ID to trigger the event here allows us to use once() elsewhere without binding too many events.
-  notificationInterface.on('ActionInvoked', actionInvoked);
-  notificationInterface.on('NotificationClosed', notificationClosed);
+  notificationInterface.on(ActionEvents.ActionInvoked, actionInvoked);
+  notificationInterface.on(ActionEvents.NotificationClosed, notificationClosed);
+  notificationInterface.on(ActionEvents.NotificationReplied, notificationReplied);
   Notifications = notificationInterface;
   return Notifications;
 };
@@ -53,8 +63,9 @@ const unsetNotifications = function unsetNotifications() {
   if (!Notifications) {
     return;
   }
-  Notifications.off('ActionInvoked', actionInvoked);
-  Notifications.off('NotificationClosed', notificationClosed);
+  Notifications.off(ActionEvents.ActionInvoked, actionInvoked);
+  Notifications.off(ActionEvents.NotificationClosed, notificationClosed);
+  Notifications.off(ActionEvents.NotificationReplied, notificationReplied);
   Notifications = undefined;
 };
 
@@ -148,10 +159,10 @@ class Notify extends EventEmitter {
 
   #config = {};
 
-  [ActionInvokedSymbol](key) {
+  [ActionInvokedSymbol](key, ...args) {
     const action = this.#actions.get(key);
     if (typeof action.callback === 'function') {
-      action.callback();
+      action.callback(...args);
     }
   }
 
@@ -278,10 +289,13 @@ class Notify extends EventEmitter {
           i.Notify(...params)
             .then((id) => {
               const invoked = this[ActionInvokedSymbol].bind(this);
-              notifierEmitter.on(`ActionInvoked:${id}`, invoked);
-              notifierEmitter.once(`NotificationClosed:${id}`, (reason) => {
+              const inlineReplyInvoked = this[ActionInvokedSymbol].bind(this, 'inline-reply');
+              notifierEmitter.on(`${ActionEvents.ActionInvoked}:${id}`, invoked);
+              notifierEmitter.on(`${ActionEvents.NotificationReplied}:${id}`, inlineReplyInvoked);
+              notifierEmitter.once(`${ActionEvents.NotificationClosed}:${id}`, (reason) => {
                 this.#status = 2;
-                notifierEmitter.off(`ActionInvoked:${id}`, invoked);
+                notifierEmitter.off(`${ActionEvents.ActionInvoked}:${id}`, invoked);
+                notifierEmitter.off(`${ActionEvents.NotificationReplied}:${id}`, inlineReplyInvoked);
                 notifierEmitter.emit('pop');
                 const result = {
                   id,
