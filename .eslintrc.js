@@ -4,10 +4,14 @@ module.exports = {
     node: true,
     es6: true,
   },
-  extends: 'airbnb-base',
-  parserOptions: {
-    ecmaVersion: 2022,
-  },
+  extends: [
+    'airbnb-base',
+    'plugin:@typescript-eslint/eslint-recommended',
+  ],
+  parser: '@typescript-eslint/parser',
+  plugins: [
+    '@typescript-eslint',
+  ],
   rules: {
     'max-len': [
       'error',

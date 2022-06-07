@@ -1,12 +1,15 @@
+/* eslint-disable no-unused-vars */
 import { ClientInterface, MessageBus } from 'dbus-next';
 import { EventEmitter } from 'stream';
 
+// eslint-disable-next-line no-shadow
 export enum Status {
   unopen = 0,
   opend = 1,
   closed = 2,
 }
 
+// eslint-disable-next-line no-shadow
 export enum Reason {
   expired = 1,
   closeByUser = 2,
@@ -52,6 +55,7 @@ export class Notify extends EventEmitter {
   constructor(config: Partial<NotifyConfig>);
 
   addAction(text: string, callback: () => void): string;
+
   addAction(text: string, key: string, callback: () => void): string;
 
   close(): Promise<void>;
@@ -65,22 +69,35 @@ export class Notify extends EventEmitter {
   show(): Promise<NotificationClosedResult>;
 
   addListener(event: 'close', listener: (result: NotificationClosedResult) => void): this;
+
   addListener(event: 'show', listener: (id: number) => void): this;
+
   emit(event: 'close', result: NotificationClosedResult): boolean;
+
   emit(event: 'show', id: number): boolean;
+
   on(event: 'close', listener: (result: NotificationClosedResult) => void): this;
+
   on(event: 'show', listener: (id: number) => void): this;
+
   once(event: 'close', listener: (result: NotificationClosedResult) => void): this;
+
   once(event: 'show', listener: (id: number) => void): this;
+
   prependListener(event: 'close', listener: (result: NotificationClosedResult) => void): this;
+
   prependListener(event: 'show', listener: (id: number) => void): this;
+
   prependOnceListener(event: 'close', listener: (result: NotificationClosedResult) => void): this;
+
   prependOnceListener(event: 'show', listener: (id: number) => void): this;
+
   removeListener(event: 'close', listener: (result: NotificationClosedResult) => void): this;
+
   removeListener(event: 'show', listener: (id: number) => void): this;
 }
 
-export interface ConfigInterface  {
+export interface ConfigInterface {
   autoDisconnectSessionBus: boolean;
 }
 
