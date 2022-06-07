@@ -56,9 +56,9 @@ export class Notify extends EventEmitter {
 
   close(): Promise<void>;
 
-  show(): Promise<NotificationClosedResult>;
-
   removeAction(key: string): boolean;
+
+  show(): Promise<NotificationClosedResult>;
 
   addListener(event: 'close', listener: (result: NotificationClosedResult) => void): this;
   addListener(event: 'show', listener: (id: number) => void): this;

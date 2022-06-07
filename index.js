@@ -1,6 +1,8 @@
 const EventEmitter = require('events');
 const { sessionBus: SessionBus, Variant } = require('dbus-next');
 
+const ActionInvokedSymbol = Symbol('actionInvoked');
+
 let externalSessionBus;
 let selfSessionBus;
 let Notifications;
@@ -134,8 +136,6 @@ notifierEmitter.on('pop', () => {
   }
 });
 
-const actionInvokedSymbol = Symbol('actionInvoked');
-
 class Notify extends EventEmitter {
   #id = 0;
 
@@ -145,7 +145,7 @@ class Notify extends EventEmitter {
 
   #config = {};
 
-  [actionInvokedSymbol](key) {
+  [ActionInvokedSymbol](key) {
     const action = this.#actions.get(key);
     if (typeof action.callback === 'function') {
       action.callback();
@@ -227,7 +227,7 @@ class Notify extends EventEmitter {
       throw new Error(`'${actionKey}' action already exists.`);
     }
     this.#actions.set(actionKey, {
-      text: text.toString(),
+      text: text ? text.toString() : '',
       callback: actionCallback,
     });
     return actionKey;
@@ -264,7 +264,7 @@ class Notify extends EventEmitter {
         .then((i) => {
           i.Notify(...params)
             .then((id) => {
-              const invoked = this[actionInvokedSymbol].bind(this);
+              const invoked = this[ActionInvokedSymbol].bind(this);
               notifierEmitter.on(`ActionInvoked:${id}`, invoked);
               notifierEmitter.once(`NotificationClosed:${id}`, (reason) => {
                 this.#status = 2;
