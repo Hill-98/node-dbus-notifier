@@ -2,6 +2,9 @@ const EventEmitter = require('events');
 const { sessionBus: SessionBus, Variant } = require('dbus-next');
 
 const ActionInvokedSymbol = Symbol('actionInvoked');
+const ActionKeys = Object.freeze({
+  DEFAULT: 'default',
+});
 
 let externalSessionBus;
 let selfSessionBus;
@@ -242,6 +245,16 @@ class Notify extends EventEmitter {
 
   removeAction(key) {
     return this.#actions.delete(key);
+  }
+
+  removeDefaultAction() {
+    return this.removeAction(ActionKeys.DEFAULT);
+  }
+
+  setDefaultAction(callback) {
+    this.removeDefaultAction();
+    this.addAction('', ActionKeys.DEFAULT, callback);
+    return this;
   }
 
   show() {
