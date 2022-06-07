@@ -4,8 +4,8 @@ import { EventEmitter } from 'stream';
 
 // eslint-disable-next-line no-shadow
 export enum Status {
-  unopen = 0,
-  opend = 1,
+  unopened = 0,
+  opened = 1,
   closed = 2,
 }
 
