@@ -315,7 +315,7 @@ class Notify extends EventEmitter {
     });
   }
 
-  static supportedFeatures() {
+  static supportedCapabilities() {
     return new Promise((resolve, reject) => {
       getInterface()
         .then((i) => {
