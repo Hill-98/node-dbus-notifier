@@ -1,8 +1,8 @@
 # node-dbus-notifier
 
-![npm](https://img.shields.io/npm/v/node-dbus-notifier)
-![node-current](https://img.shields.io/node/v/node-dbus-notifier)
-![npm](https://img.shields.io/npm/dm/node-dbus-notifier)
+<a href="https://www.npmjs.com/package/node-dbus-notifier"><img src="https://img.shields.io/npm/v/node-dbus-notifier" alt="npm"></a>
+<a href="https://nodejs.org/"><img src="https://img.shields.io/node/v/node-dbus-notifier" alt="node"></a>
+<a href="https://www.npmjs.com/package/node-dbus-notifier"><img src="https://img.shields.io/npm/dm/node-dbus-notifier" alt="downloads"></a>
 
 A DBus-based NodeJS library for desktop notifications.
 
@@ -84,21 +84,33 @@ See the [DBus protocol](https://specifications.freedesktop.org/notification-spec
 > 
 > If an external DBus session or interface is set, it will not auto disconnect the DBus session.
 
+### Supported non-standard specification actions
+
+* `inline-reply`: Add inline reply input box to the notification, the first parameter of the callback function is the submitted message.
+
 ### `Notify`
 
 * `constructor(config: Partial<NotifyConfig>)`: Initialize a notification, accepting the same parameters as `org.freedesktop.Notifications.Notify`, except for `actions` (using `addAction()`). `hints` does not support attributes marked as "iibiiay".
 
-* `addAction(actionText: string, callback: () => void): this`: Add an action to the notification
+* `addAction(text: string, callback: () => void): string`: Add an action to the notification with random action key, return action key.
+
+* `addAction(text: string, key: string, callback: () => void): string`: Add an action to notification with custom action key, return action key. If the key is duplicated, the previously added action will be overwritten.
 
 * `close(): void`: Use `org.freedesktop.Notifications.CloseNotification` to actively close notifications.
 
-* `show()`: Use `org.freedesktop.Notifications.Notify` to display the notification and mark the Promise as resolved when the notification is dismissed.
+* `removeAction(key: string): boolean`: Use action key remove an added action
 
-* `removeAction(actionText: string): this`: remove an added action
+* `removeDefaultAction(): boolean` : Alias for `removeAction("default")`.
+
+* `setDefaultAction(callback: () => void): void` : Alias for `addAction("", "default", callback)`. (The 'Default' action trigger is the click notification.)
+
+* `show()`: Use `org.freedesktop.Notifications.Notify` to display the notification and mark the Promise as resolved when the notification is dismissed.
 
 * `event: close`: Notification is closed
 
 * `event: show`: Notification is displayed
+
+* `static supportedCapabilities(): Promise<string[]>`: The capabilities supported by the notification server.
 
 ### `Config: ConfigInterface`
 
@@ -147,3 +159,7 @@ If no arguments are passed, the internal session will be reused.
 ## Thanks
 
 Thanks to [dbusjs/node-dbus-next](https://github.com/dbusjs/node-dbus-next) for the DBus session support.
+
+Thanks to [JetBrains](https://jb.gg/OpenSourceSupport) for providing the JetBrains IDEs open source license.
+
+<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main) logo." width="256px" height="256px">
