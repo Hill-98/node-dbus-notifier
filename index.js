@@ -45,8 +45,8 @@ const notificationClosed = function notificationClosed(id, reason) {
   notifierEmitter.emit(`${ActionEvents.NotificationClosed}:${id}`, reason);
 };
 
-const notificationReplied = function notificationReplied(id, reason) {
-  notifierEmitter.emit(`${ActionEvents.NotificationReplied}:${id}`, reason);
+const notificationReplied = function notificationReplied(id, message) {
+  notifierEmitter.emit(`${ActionEvents.NotificationReplied}:${id}`, message);
 };
 
 const bindNotifications = function bindNotifications(notificationInterface) {
@@ -263,9 +263,7 @@ class Notify extends EventEmitter {
   }
 
   setDefaultAction(callback) {
-    this.removeDefaultAction();
     this.addAction('', ActionKeys.DEFAULT, callback);
-    return this;
   }
 
   show() {
