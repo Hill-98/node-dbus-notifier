@@ -94,7 +94,7 @@ See the [DBus protocol](https://specifications.freedesktop.org/notification-spec
 
 * `addAction(text: string, callback: () => void): string`: Add an action to the notification with random action key, return action key.
 
-* `addAction(text: string, key: string, callback: () => void): string`: Add an action to notification with custom action key, return action key. If the key is duplicated, the previously added action will be overwritten.
+* `addAction(text: string, key: string, callback: () => void): string`: Add an action to notification with custom action key, return action key.
 
 * `close(): void`: Use `org.freedesktop.Notifications.CloseNotification` to actively close notifications.
 
