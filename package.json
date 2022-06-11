@@ -31,9 +31,11 @@
     "node": ">= 12.0.0"
   },
   "dependencies": {
+    "check-types": "^11.1.2",
     "dbus-next": "^0.10.2"
   },
   "devDependencies": {
+    "@types/check-types": "^7.3.3",
     "@types/node": "^12.0.0",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
@@ -43,6 +45,6 @@
     "typescript": "^4.7.3"
   },
   "volta": {
-    "node": "12.0.0"
+    "node": "12.22.12"
   }
 }

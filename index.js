@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const { sessionBus: SessionBus, Variant } = require('dbus-next');
+const { assert: typeAssert } = require('check-types');
 
 const ActionInvokedSymbol = Symbol('actionInvoked');
 const ActionEvents = Object.freeze({
@@ -159,6 +160,7 @@ class Notify extends EventEmitter {
 
   #config = {};
 
+  // NodeJS 12 private method not supported
   [ActionInvokedSymbol](key, ...args) {
     const action = this.#actions.get(key);
     if (typeof action.callback === 'function') {
@@ -176,56 +178,77 @@ class Notify extends EventEmitter {
 
   constructor(config) {
     super();
+
     this.#config = {
       appName: config.appName || '',
       replacesId: config.replacesId || 0,
       appIcon: config.appIcon || '',
       summary: config.summary || '',
       body: config.body || '',
-      actions: [],
       hints: {},
       timeout: config.timeout || 0,
     };
-    const hints = config.hints || {};
-    if (typeof hints.actionIcons === 'boolean') {
+
+    const hints = { ...config.hints } || {};
+
+    typeAssert.string(this.#config.appName, 'appName is not string.');
+    typeAssert.integer(this.#config.replacesId, 'replacesId is not integer.');
+    typeAssert.string(this.#config.appIcon, 'appIcon is not string.');
+    typeAssert.string(this.#config.summary, 'summary is not string.');
+    typeAssert.string(this.#config.body, 'body is not string.');
+    typeAssert.object(hints, 'hints is not object.');
+    typeAssert.integer(this.#config.timeout, 'timeout is not integer.');
+
+    if ('actionIcons' in hints && typeAssert.boolean(hints.actionIcons, 'hints.actionIcons is not boolean.')) {
       this.#config.hints['action-icons'] = new Variant('b', hints.actionIcons);
     }
-    if (typeof hints.category === 'string') {
+
+    if ('category' in hints && typeAssert.string(hints.category, 'hints.category is not string.')) {
       // eslint-disable-next-line dot-notation
       this.#config.hints['category'] = new Variant('s', hints.category);
     }
-    if (typeof hints.desktopEntry === 'string') {
+
+    if ('desktopEntry' in hints && typeAssert.string(hints.desktopEntry, 'hints.desktopEntry is not string.')) {
       this.#config.hints['desktop-entry'] = new Variant('s', hints.desktopEntry);
     }
-    if (typeof hints.imagePath === 'string') {
+
+    if ('imagePath' in hints && typeAssert.string(hints.imagePath, 'hints.imagePath is not string.')) {
       this.#config.hints['image-path'] = new Variant('s', hints.imagePath);
     }
-    if (typeof hints.resident === 'boolean') {
+
+    if ('resident' in hints && typeAssert.boolean(hints.resident, 'hints.resident is not boolean.')) {
       // eslint-disable-next-line dot-notation
       this.#config.hints['resident'] = new Variant('b', hints.resident);
     }
-    if (typeof hints.soundFile === 'string') {
+
+    if ('soundFile' in hints && typeAssert.string(hints.soundFile, 'hints.soundFile is not string.')) {
       this.#config.hints['sound-file'] = new Variant('s', hints.soundFile);
     }
-    if (typeof hints.soundName === 'string') {
+
+    if ('soundName' in hints && typeAssert.string(hints.soundName, 'hints.soundName is not string.')) {
       this.#config.hints['sound-name'] = new Variant('s', hints.soundName);
     }
-    if (typeof hints.suppressSound === 'boolean') {
+
+    if ('suppressSound' in hints && typeAssert.boolean(hints.suppressSound, 'hints.suppressSound is not boolean.')) {
       this.#config.hints['suppress-sound'] = new Variant('b', hints.suppressSound);
     }
-    if (typeof hints.transient === 'boolean') {
+
+    if ('transient' in hints && typeAssert.boolean(hints.transient, 'hints.transient is not boolean.')) {
       // eslint-disable-next-line dot-notation
       this.#config.hints['transient'] = new Variant('b', hints.transient);
     }
-    if (typeof hints.x === 'number') {
+
+    if ('x' in hints && typeAssert.integer(hints.x, 'hints.x is not integer.')) {
       // eslint-disable-next-line dot-notation
       this.#config.hints['x'] = new Variant('i', hints.x);
     }
-    if (typeof hints.y === 'number') {
+
+    if ('y' in hints && typeAssert.integer(hints.y, 'hints.y is not integer.')) {
       // eslint-disable-next-line dot-notation
       this.#config.hints['y'] = new Variant('i', hints.y);
     }
-    if (typeof hints.urgency === 'number') {
+
+    if ('urgency' in hints && typeAssert.integer(hints.urgency, 'hints.urgency is not integer.')) {
       // eslint-disable-next-line dot-notation
       this.#config.hints['urgency'] = new Variant('y', hints.urgency);
     }
@@ -233,15 +256,18 @@ class Notify extends EventEmitter {
 
   addAction(text, key, callback) {
     const actionCallback = callback === undefined ? key : callback;
-    const actionKey = callback === undefined ? `__action_key__::${identifier.next().value}` : key.toString();
-    if (typeof actionCallback !== 'function') {
-      throw new TypeError('callback is not a function.');
-    }
+    const actionKey = callback === undefined ? `__action_key__::${identifier.next().value}` : key;
+
+    typeAssert.string(text, 'text is not string.');
+    typeAssert.string(actionKey, 'key is not string.');
+    typeAssert.function(actionCallback, 'callback is not function.');
+
     if (this.#actions.has(actionKey)) {
       throw new Error(`'${actionKey}' action already exists.`);
     }
+
     this.#actions.set(actionKey, {
-      text: text ? text.toString() : '',
+      text,
       callback: actionCallback,
     });
     return actionKey;
@@ -255,6 +281,7 @@ class Notify extends EventEmitter {
   }
 
   removeAction(key) {
+    typeAssert.string(key, 'key is not string.');
     return this.#actions.delete(key);
   }
 
