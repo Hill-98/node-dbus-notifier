@@ -238,6 +238,11 @@ class Notify extends EventEmitter {
       this.#config.hints['transient'] = new Variant('b', hints.transient);
     }
 
+    if ('value' in hints && typeAssert.integer(hints.value, 'hints.value is not integer.')) {
+      // eslint-disable-next-line dot-notation
+      this.#config.hints['value'] = new Variant('i', hints.value);
+    }
+
     if ('x' in hints && typeAssert.integer(hints.x, 'hints.x is not integer.')) {
       // eslint-disable-next-line dot-notation
       this.#config.hints['x'] = new Variant('i', hints.x);
