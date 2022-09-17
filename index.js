@@ -253,7 +253,7 @@ class Notify extends EventEmitter {
       this.#config.hints['y'] = new Variant('i', hints.y);
     }
 
-    if ('urgency' in hints && typeAssert.integer(hints.urgency, 'hints.urgency is not integer.')) {
+    if ('urgency' in hints && typeAssert.integer(hints.urgency, 'hints.urgency is not integer.') != null) {
       // eslint-disable-next-line dot-notation
       this.#config.hints['urgency'] = new Variant('y', hints.urgency);
     }
