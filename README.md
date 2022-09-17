@@ -6,7 +6,7 @@
 
 A DBus-based NodeJS library for desktop notifications.
 
-Use the DBus interface `org.freedesktop.Notifications` to create notifications instead of using `notify-send`, making it possible to provide full-featured support for desktop notifications on Linux (or any DBus-enabled system) and conform to the [Desktop Notifications Specification](https://specifications.freedesktop.org/notification-spec/latest/).
+Use the DBus interface `org.freedesktop.Notifications` to create notifications instead of using `notify-send`, making it possible to provide full-featured support for desktop notifications on Linux (or any DBus-enabled system) and conform to the [Desktop Notifications Specification](https://specifications.freedesktop.org/notification-spec/1.2/).
 
 Implementation Specification Version: 1.2
 
@@ -18,7 +18,7 @@ Using yarn: `yarn add node-dbus-notifier`
 
 ## Examples
 
-Make sure your current system supports DBus and has a provider that conforms to the [Desktop Notifications Specification](https://specifications.freedesktop.org/notification-spec/latest/) before using it.
+Make sure your current system supports DBus and has a provider that conforms to the [Desktop Notifications Specification](https://specifications.freedesktop.org/notification-spec/1.2/) before using it.
 
 ### simple notification
 
@@ -76,7 +76,7 @@ const notify = new Notify({
 notify.show();
 ```
 
-See the [DBus protocol](https://specifications.freedesktop.org/notification-spec/latest/ar01s09.html) of the [Desktop Notifications Specification](https://specifications.freedesktop.org/notification-spec/latest/) for more information.
+See the [DBus protocol](https://specifications.freedesktop.org/notification-spec/1.2/ar01s09.html) of the [Desktop Notifications Specification](https://specifications.freedesktop.org/notification-spec/1.2/) for more information.
 
 ## Usage
 
@@ -90,13 +90,13 @@ See the [DBus protocol](https://specifications.freedesktop.org/notification-spec
 
 ### `Notify`
 
-* `constructor(config: Partial<NotifyConfig>)`: Initialize a notification, accepting the same parameters as `org.freedesktop.Notifications.Notify`, except for `actions` (using `addAction()`). `hints` does not support attributes marked as "iibiiay".
+* `constructor(config: Partial<NotifyConfig>)`: Initialize a notification, accepting the same parameters as `org.freedesktop.Notifications.Notify`, except for `actions` (using `addAction()`). `hints` does not support attributes marked as "Deprecated".
 
 * `addAction(text: string, callback: () => void): string`: Add an action to the notification with random action key, return action key.
 
 * `addAction(text: string, key: string, callback: () => void): string`: Add an action to notification with custom action key, return action key.
 
-* `close(): void`: Use `org.freedesktop.Notifications.CloseNotification` to actively close notifications.
+* `close(): void`: Use `org.freedesktop.Notifications.CloseNotification` actively close notification.
 
 * `removeAction(key: string): boolean`: Use action key remove an added action
 
@@ -114,7 +114,7 @@ See the [DBus protocol](https://specifications.freedesktop.org/notification-spec
 
 ### `Config: ConfigInterface`
 
-* `autoDisconnectSessionBus`: If set to `false`, the DBus session will not be disconnected automatically. Defaults to `true`, if there is no notification, the internal DBus session will be automatically disconnected. 
+* `autoDisconnectSessionBus`: If set to `false`, the internal DBus session will not be automatically disconnected. Defaults to `true`, if there is no notification, the internal DBus session will be automatically disconnected. 
 
 ### `disconnectSessionBus(): void`
 
@@ -124,7 +124,7 @@ You shouldn't use it anywhere unless you set `Config.autoDisconnectSessionBus` t
 
 ### `getInterface(): ClientInterface`
 
-Get DBus interface: `org.freedesktop.Notifications`
+Get DBus interface `org.freedesktop.Notifications`.
 
 If the interface is set from outside, it will return the external interface.
 
@@ -132,7 +132,7 @@ If the interface is set from outside, it will return the external interface.
 
 ### `setInterface(notificationInterface?: ClientInterface): void`
 
-Set DBus interface: `org.freedesktop.Notifications`
+Set DBus interface `org.freedesktop.Notifications`.
 
 Set up an `org.freedesktop.Notifications` interface externally if you want to share an existing DBus interface.
 
@@ -140,7 +140,7 @@ If no arguments are passed, the internal interface will be reused.
 
 ### `getSessionBus(): MessageBus`
 
-Get DBus Session
+Get DBus Session.
 
 If the session is set from outside, it will return the external session.
 
@@ -148,7 +148,7 @@ If the session is set from outside, it will return the external session.
 
 ### `setSessionBus(sessionBus?: MessageBus): void`
 
-Set DBus session for `dbus-next`
+Set DBus session.
 
 Set up an DBus session  externally if you want to share an existing DBus session.
 
