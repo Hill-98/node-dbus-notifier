@@ -1,6 +1,6 @@
 {
   "name": "node-dbus-notifier",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "DBus-based desktop notifications with full feature support",
   "keywords": [
     "dbus",
@@ -12,7 +12,8 @@
     "LICENSE",
     "README.md",
     "index.js",
-    "index.d.ts"
+    "index.d.ts",
+    "utils"
   ],
   "main": "index.js",
   "types": "index.d.js",
