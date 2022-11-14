@@ -281,7 +281,8 @@ class Notify extends EventEmitter {
 
   close() {
     if (this.#id !== 0) {
-      return getInterface().CloseNotification(this.#id);
+      return getInterface()
+        .then((i) => i.CloseNotification(this.#id));
     }
     return Promise.resolve();
   }
@@ -347,17 +348,8 @@ class Notify extends EventEmitter {
   }
 
   static supportedCapabilities() {
-    return new Promise((resolve, reject) => {
-      getInterface()
-        .then((i) => {
-          i.GetCapabilities()
-            .then((caps) => {
-              resolve(caps);
-            })
-            .catch(reject);
-        })
-        .catch(reject);
-    });
+    return getInterface()
+      .then((i) => i.GetCapabilities());
   }
 }
 
