@@ -1,6 +1,6 @@
 {
   "name": "node-dbus-notifier",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "DBus-based desktop notifications with full feature support",
   "keywords": [
     "dbus",
@@ -16,7 +16,7 @@
     "utils"
   ],
   "main": "index.js",
-  "types": "index.d.js",
+  "types": "index.d.ts",
   "homepage": "https://github.com/Hill-98/node-dbus-notifier",
   "repository": "github:Hill-98/node-dbus-notifier",
   "bugs": {
@@ -35,7 +35,6 @@
     "dbus-next": "^0.10.2"
   },
   "devDependencies": {
-    "@types/check-types": "^7.3.3",
     "@types/node": "^12.0.0",
     "@typescript-eslint/eslint-plugin": "^5.38.0",
     "@typescript-eslint/parser": "^5.38.0",

@@ -67,11 +67,6 @@
   resolved "https://registry.yarnpkg.com/@nornagon/put/-/put-0.0.8.tgz#9d497ec46c9364acc3f8b59aa3cf8ee4134ae337"
   integrity sha512-ugvXJjwF5ldtUpa7D95kruNJ41yFQDEKyF5CW4TgKJnh+W/zmlBzXXeKTyqIgwMFrkePN2JqOBqcF0M0oOunow==
 
-"@types/check-types@^7.3.3":
-  version "7.3.4"
-  resolved "https://registry.yarnpkg.com/@types/check-types/-/check-types-7.3.4.tgz#6b7e272d76396e6a1357e72aa1f4d68d5625ea5d"
-  integrity sha512-/OZLG2Uy7DMs3LowUnjJXDGG0ggvt2ffL15inlHbG1ldd2ilKROsGBWJgC2jDceL2n2wOurXix3N24GuqDkzMA==
-
 "@types/json-schema@^7.0.9":
   version "7.0.11"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.11.tgz#d421b6c527a3037f7c84433fd2c4229e016863d3"
