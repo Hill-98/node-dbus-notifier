@@ -21,6 +21,7 @@ const notificationCounter = [];
 
 const Config = {
   autoDisconnectSessionBus: true,
+  closeReplacedNotify: false,
 };
 
 const notifierEmitter = new EventEmitter();
@@ -321,6 +322,14 @@ class Notify extends EventEmitter {
         .then((i) => {
           i.Notify(...params)
             .then((id) => {
+              this.#id = id;
+              this.#status = 1;
+              notifierEmitter.emit('push');
+              this.emit('show', id);
+
+              if (this.#config.replacesId === id && Config.closeReplacedNotify) {
+                notifierEmitter.emit(`${DbusEvents.NotificationClosed}:${id}`, 101);
+              }
               const invoked = this[ActionInvokedSymbol].bind(this);
               const inlineReplyInvoked = this[ActionInvokedSymbol].bind(this, ActionKeys.inlineReply);
               notifierEmitter.on(`${DbusEvents.ActionInvoked}:${id}`, invoked);
@@ -337,10 +346,6 @@ class Notify extends EventEmitter {
                 this.emit('close', result);
                 resolve(result);
               });
-              this.#id = id;
-              this.#status = 1;
-              notifierEmitter.emit('push');
-              this.emit('show', id);
             })
             .catch(reject);
         })

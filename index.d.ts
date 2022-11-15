@@ -21,6 +21,12 @@ export enum Reason {
   undefined = 4,
 }
 
+// eslint-disable-next-line no-shadow
+export enum InternalReason {
+  /** The notification replaced. */
+  replaced = 101,
+}
+
 export interface Hints {
   actionIcons: boolean;
   /** The type of notification this is. */
@@ -88,7 +94,7 @@ export interface NotificationClosedResult {
   /** The ID of the notification that was closed. */
   id: number;
   /** The reason the notification was closed. */
-  reason: Reason;
+  reason: Reason | InternalReason;
 }
 
 export class Notify extends EventEmitter {
@@ -160,6 +166,12 @@ export class Notify extends EventEmitter {
 export interface ConfigInterface {
   /** If set to `false`, the internal DBus session will not be automatically disconnected. */
   autoDisconnectSessionBus: boolean;
+  /**
+   * If set to `true`, new notification will internally emit close event to old notification when `replacesId` is set.
+   * It is used to handle multiple notifications with the same replacesId triggering multiple actions.
+   * @see {@link https://github.com/Hill-98/node-dbus-notifier/issues/8 Issue#8}
+   */
+  closeReplacedNotify: boolean;
 }
 
 export const Config: ConfigInterface;
