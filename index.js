@@ -219,6 +219,19 @@ class Notify extends EventEmitter {
       this.#config.hints['image-path'] = new Variant('s', hints.imagePath);
     }
 
+    if ('imageData' in hints && checkTypes.object(hints.imageData, 'hints.imagePath is not object.')) {
+      const channel = (hints.imageData.hasAlpha ? 4 : 3);
+      this.#config.hints['image-data'] = new Variant('(iiibiiay)', [
+        hints.imageData.width,
+        hints.imageData.height,
+        hints.imageData.width * channel,
+        hints.imageData.hasAlpha,
+        8,
+        channel,
+        hints.imageData.data,
+      ]);
+    }
+
     if ('resident' in hints && checkTypes.boolean(hints.resident, 'hints.resident is not boolean.')) {
       // eslint-disable-next-line dot-notation
       this.#config.hints['resident'] = new Variant('b', hints.resident);
