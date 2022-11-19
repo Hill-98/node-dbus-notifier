@@ -14,10 +14,14 @@ const checkInteger = function checkInteger(value, message) {
   return ifTypeError(Number.isInteger(value), message);
 };
 
+const checkObject = function checkObject(value, message) {
+  return ifTypeError(value && typeof value === 'object', message);
+};
+
 module.exports = {
   boolean: checkType.bind(this, 'boolean'),
   function: checkType.bind(this, 'function'),
   integer: checkInteger,
-  object: checkType.bind(this, 'object'),
+  object: checkObject,
   string: checkType.bind(this, 'string'),
 };

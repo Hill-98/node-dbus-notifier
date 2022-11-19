@@ -33,8 +33,17 @@ export interface Hints {
   category: string;
   /** This specifies the name of the desktop filename representing the calling program. This should be the same as the prefix used for the application's .desktop file. */
   desktopEntry: string;
-  /** This is a raw data image format which describes the width, height, rowstride, has alpha, bits per sample, channels and image data respectively. */
-  imageData: never;
+  /** This is a raw data image format. */
+  imageData: {
+    /** Image width */
+    width: number,
+    /** Image height */
+    height: number,
+    /** Whether the image has alpha channel/transparency */
+    hasAlpha: boolean,
+    /** Encoded image data, in RGB byte order */
+    data: number[],
+  };
   /**
    * Alternative way to define the notification image.
    * @see {@link https://specifications.freedesktop.org/notification-spec/1.2/ar01s05.html Icons and Images}
