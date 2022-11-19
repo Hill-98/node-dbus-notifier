@@ -219,8 +219,8 @@ class Notify extends EventEmitter {
       this.#config.hints['image-path'] = new Variant('s', hints.imagePath);
     }
 
-    if ('imageData' in hints && checkTypes.object(hints.imageData, 'hints.imagePath is not object.')) {
-      const channel = (hints.imageData.hasAlpha ? 4 : 3);
+    if ('imageData' in hints && checkTypes.object(hints.imageData, 'hints.imageData is not object.')) {
+      const channel = hints.imageData.hasAlpha ? 4 : 3;
       this.#config.hints['image-data'] = new Variant('(iiibiiay)', [
         hints.imageData.width,
         hints.imageData.height,
