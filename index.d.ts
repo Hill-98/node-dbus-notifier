@@ -27,6 +27,17 @@ export enum InternalReason {
   replaced = 101,
 }
 
+export interface ImageData {
+  /** Image width */
+  width: number,
+  /** Image height */
+  height: number,
+  /** Whether the image has alpha channel/transparency */
+  hasAlpha: boolean,
+  /** Encoded image data, in RGB byte order */
+  data: Uint8ClampedArray,
+}
+
 export interface Hints {
   actionIcons: boolean;
   /** The type of notification this is. */
@@ -34,16 +45,7 @@ export interface Hints {
   /** This specifies the name of the desktop filename representing the calling program. This should be the same as the prefix used for the application's .desktop file. */
   desktopEntry: string;
   /** This is a raw data image format. */
-  imageData: {
-    /** Image width */
-    width: number,
-    /** Image height */
-    height: number,
-    /** Whether the image has alpha channel/transparency */
-    hasAlpha: boolean,
-    /** Encoded image data, in RGB byte order */
-    data: number[],
-  };
+  imageData: ImageData
   /**
    * Alternative way to define the notification image.
    * @see {@link https://specifications.freedesktop.org/notification-spec/1.2/ar01s05.html Icons and Images}

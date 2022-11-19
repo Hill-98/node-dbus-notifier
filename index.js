@@ -228,7 +228,7 @@ class Notify extends EventEmitter {
         hints.imageData.hasAlpha,
         8,
         channel,
-        hints.imageData.data,
+        [...hints.imageData.data],
       ]);
     }
 
@@ -340,7 +340,7 @@ class Notify extends EventEmitter {
               notifierEmitter.emit('push');
               this.emit('show', id);
 
-              if (this.#config.replacesId === id && Config.closeReplacedNotify) {
+              if (Config.closeReplacedNotify && this.#config.replacesId === id) {
                 notifierEmitter.emit(`${DbusEvents.NotificationClosed}:${id}`, 101);
               }
               const invoked = this[ActionInvokedSymbol].bind(this);
